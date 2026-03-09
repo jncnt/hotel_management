@@ -1,8 +1,12 @@
 import React from 'react';
 import { Home, CalendarCheck, Users, Banknote, ArrowUpRight, Clock, BedDouble } from 'lucide-react';
 import { mockRooms, mockReservations, mockGuests, mockInvoices } from '../data/mockData';
+import { useAuth } from '../contexts/AuthContext';
+import { rbacUtils } from '../lib/rbac';
 
 export const Dashboard: React.FC = () => {
+    const { user } = useAuth();
+    
     const availableRooms = mockRooms.filter(r => r.status === 'Available').length;
     const activeReservations = mockReservations.filter(r => r.status === 'Checked-In').length;
     const totalGuests = mockGuests.length;
@@ -12,40 +16,54 @@ export const Dashboard: React.FC = () => {
         (mockRooms.filter(r => r.status === 'Occupied').length / mockRooms.length) * 100
     );
 
-    const statCards = [
-        {
-            label: 'Available Rooms',
-            value: `${availableRooms} / ${mockRooms.length}`,
-            icon: Home,
-            change: '+2 today',
-            color: 'from-orange-400 to-amber-500',
-            bgLight: 'bg-orange-50',
-        },
-        {
-            label: 'Active Check-ins',
-            value: activeReservations.toString(),
-            icon: CalendarCheck,
-            change: `${pendingReservations} pending`,
-            color: 'from-emerald-400 to-teal-500',
-            bgLight: 'bg-emerald-50',
-        },
-        {
-            label: 'Total Guests',
-            value: totalGuests.toString(),
-            icon: Users,
-            change: 'All time',
-            color: 'from-violet-400 to-purple-500',
-            bgLight: 'bg-violet-50',
-        },
-        {
-            label: 'Total Revenue',
-            value: `₱${totalRevenue.toLocaleString()}`,
-            icon: Banknote,
-            change: '+12.5%',
-            color: 'from-sky-400 to-blue-500',
-            bgLight: 'bg-sky-50',
-        },
-    ];
+    // Filter stats based on user permissions
+    const getStatCards = () => {
+        const baseCards = [
+            {
+                label: 'Available Rooms',
+                value: `${availableRooms} / ${mockRooms.length}`,
+                icon: Home,
+                change: '+2 today',
+                color: 'from-orange-400 to-amber-500',
+                bgLight: 'bg-orange-50',
+                permission: 'view_rooms' as const,
+            },
+            {
+                label: 'Active Check-ins',
+                value: activeReservations.toString(),
+                icon: CalendarCheck,
+                change: `${pendingReservations} pending`,
+                color: 'from-emerald-400 to-teal-500',
+                bgLight: 'bg-emerald-50',
+                permission: 'view_reservations' as const,
+            },
+            {
+                label: 'Total Guests',
+                value: totalGuests.toString(),
+                icon: Users,
+                change: 'All time',
+                color: 'from-violet-400 to-purple-500',
+                bgLight: 'bg-violet-50',
+                permission: 'view_guests' as const,
+            },
+            {
+                label: 'Total Revenue',
+                value: `₱${totalRevenue.toLocaleString()}`,
+                icon: Banknote,
+                change: '+12.5%',
+                color: 'from-sky-400 to-blue-500',
+                bgLight: 'bg-sky-50',
+                permission: 'view_billing' as const,
+            },
+        ];
+
+        // Only show cards for which the user has permission
+        return baseCards.filter(card => 
+            user && rbacUtils.hasPermission(user, card.permission)
+        );
+    };
+
+    const statCards = getStatCards();
 
     const statusColors: Record<string, string> = {
         'Available': 'bg-emerald-500',
