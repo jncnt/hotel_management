@@ -53,19 +53,6 @@ export const Login: React.FC = () => {
             <p className="text-gray-600">Sign in to manage your hotel</p>
           </div>
 
-          {/* Demo Credentials */}
-          <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-            <p className="text-sm text-orange-800 font-medium mb-2">Predefined Credentials:</p>
-            <div className="space-y-1 text-xs text-orange-700">
-              <p><strong>Admin:</strong> admin@luxestay.com / password</p>
-              <p><strong>Manager:</strong> manager@luxestay.com / password</p>
-              <p><strong>Staff:</strong> staff@luxestay.com / password</p>
-            </div>
-            <p className="text-xs text-orange-600 mt-2 italic">
-              Admin account is predefined and always available
-            </p>
-          </div>
-
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {successMessage && (
