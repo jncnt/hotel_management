@@ -121,7 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('email', credentials.email);
       
       if (checkError) {
-        throw new Error('Database error. Please try again.');
+        console.error('Supabase checkError:', checkError);
+        throw new Error(`Database error: ${checkError.message}. Please try again.`);
       }
       
       if (existingUsers && existingUsers.length > 0) {
@@ -129,14 +130,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Create new user in Supabase
-      const { error: insertError } = await supabase
+      const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert({
           email: credentials.email,
           name: credentials.name,
           role: credentials.role,
           password: credentials.password
-        });
+        })
+        .select()
+        .single();
+      
+      if (insertError) {
+        console.error('Supabase insertError:', insertError);
+        throw new Error(`Failed to create account: ${insertError.message}. Please try again.`);
+      }
       
       if (insertError) {
         throw new Error('Failed to create account. Please try again.');
