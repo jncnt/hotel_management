@@ -130,7 +130,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Create new user in Supabase
-      const { data: newUser, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('users')
         .insert({
           email: credentials.email,
