@@ -1,9 +1,0 @@
-# Enable rewrite engine
-RewriteEngine On
-
-# Handle requests for non-existent files/directories
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
-# Redirect all requests to index.html
-RewriteRule ^ /index.html [L]
